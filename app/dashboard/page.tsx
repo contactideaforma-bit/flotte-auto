@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Plus, Car, AlertTriangle, CheckCircle, Pencil, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase-client'
-import Sidebar from '@/components/Sidebar'
+import BottomNav from '@/components/BottomNav'
 import VehicleModal from '@/components/VehicleModal'
 import MiniCalendar from '@/components/MiniCalendar'
 import StatusBadge from '@/components/StatusBadge'
@@ -62,138 +62,169 @@ export default function Dashboard() {
     .map(v => ({ v, days: getDaysUntilAlert(v) }))
     .filter(({ days }) => days !== null && days <= 30)
     .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
-    .slice(0, 6)
+    .slice(0, 5)
 
   const dotColor = (days: number | null) => days === null ? '#ccc' : days <= 0 ? 'var(--danger)' : days <= 10 ? 'var(--warn)' : 'var(--ok)'
-  const ck = (ok: boolean) => <span style={{ fontSize: 16, color: ok ? 'var(--ok)' : '#ccc' }}>{ok ? '✓' : '✗'}</span>
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar alertCount={alertCount} userEmail={userEmail} />
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <header style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border)', padding: '0.875rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 style={{ fontSize: 17, fontWeight: 500 }}>Tableau de bord</h1>
-          <button onClick={() => { setEditVehicle(null); setModalOpen(true) }} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 9, border: 'none', background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>
-            <Plus size={16} /> Ajouter un véhicule
+      {/* Header */}
+      <header style={{
+        background: 'var(--bg-sidebar)',
+        padding: '3rem 1.25rem 1.25rem',
+        paddingTop: 'max(3rem, calc(env(safe-area-inset-top) + 1.25rem))',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-sidebar)', marginBottom: 2 }}>Mymy la King 👑</div>
+            <h1 style={{ fontSize: 20, fontWeight: 500, color: '#fff' }}>Flotte auto</h1>
+          </div>
+          <button
+            onClick={() => { setEditVehicle(null); setModalOpen(true) }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '10px 16px', borderRadius: 10, border: 'none',
+              background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 500,
+            }}
+          >
+            <Plus size={16} /> Ajouter
           </button>
-        </header>
+        </div>
+      </header>
 
-        <div style={{ flex: 1, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="page-content" style={{ padding: '1rem', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-          {/* Metrics */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-            {[
-              { icon: <Car size={16} />, label: 'Véhicules total', value: vehicles.length, sub: 'dans le parc', color: 'var(--accent)' },
-              { icon: <AlertTriangle size={16} />, label: 'Alertes actives', value: alertCount, sub: 'assurances à renouveler', color: 'var(--danger)' },
-              { icon: <CheckCircle size={16} />, label: 'Véhicules conformes', value: compliantCount, sub: 'CT + CG + entretien à jour', color: 'var(--ok)' },
-            ].map(({ icon, label, value, sub, color }) => (
-              <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '1rem 1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                  <span style={{ color }}>{icon}</span>{label}
+        {/* Metrics */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {[
+            { icon: <Car size={15} />, label: 'Total', value: vehicles.length, color: 'var(--accent)' },
+            { icon: <AlertTriangle size={15} />, label: 'Alertes', value: alertCount, color: 'var(--danger)' },
+            { icon: <CheckCircle size={15} />, label: 'Conformes', value: compliantCount, color: 'var(--ok)' },
+          ].map(({ icon, label, value, color }) => (
+            <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '0.875rem 0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                <span style={{ color }}>{icon}</span>{label}
+              </div>
+              <div style={{ fontSize: 26, fontWeight: 500, color, lineHeight: 1 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar */}
+        <div className="card" style={{ padding: '1rem' }}>
+          <div style={{ fontSize: 13, fontWeight: 500, marginBottom: '0.875rem' }}>Calendrier des alertes</div>
+          <MiniCalendar alertDays={alertDays} />
+        </div>
+
+        {/* Upcoming alerts */}
+        {upcomingAlerts.length > 0 && (
+          <div className="card" style={{ overflow: 'hidden' }}>
+            <div style={{ padding: '0.875rem 1rem', borderBottom: '1px solid var(--border)', fontSize: 13, fontWeight: 500 }}>
+              Prochaines alertes
+            </div>
+            {upcomingAlerts.map(({ v, days }) => (
+              <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.875rem 1rem', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor(days), flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.immat} — {v.model}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                    {days !== null && days <= 0 ? 'Échéance dépassée' : `Dans ${days} jour${days !== 1 ? 's' : ''}`} · J+{ALERT_DAYS}
+                  </div>
                 </div>
-                <div style={{ fontSize: 30, fontWeight: 500, color, lineHeight: 1, marginBottom: 4 }}>{value}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{sub}</div>
               </div>
             ))}
           </div>
+        )}
 
-          {/* Calendar + Alerts */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.25rem' }}>
-              <div style={{ fontSize: 13, fontWeight: 500, marginBottom: '1rem' }}>Calendrier des alertes</div>
-              <MiniCalendar alertDays={alertDays} />
+        {/* Vehicle list */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', paddingLeft: 2 }}>
+            Parc — {vehicles.length} véhicule{vehicles.length > 1 ? 's' : ''}
+          </div>
+
+          {loading && <div style={{ textAlign: 'center', padding: '2rem', fontSize: 13, color: 'var(--text-secondary)' }}>Chargement…</div>}
+
+          {!loading && vehicles.length === 0 && (
+            <div className="card" style={{ padding: '2rem', textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)' }}>
+              Aucun véhicule — appuyez sur "Ajouter"
             </div>
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', fontSize: 13, fontWeight: 500 }}>Prochaines alertes</div>
-              {upcomingAlerts.length === 0 ? (
-                <div style={{ padding: '2rem', textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={24} style={{ color: 'var(--ok)', display: 'block', margin: '0 auto 8px' }} />
-                  Aucune alerte dans les 30 jours
-                </div>
-              ) : upcomingAlerts.map(({ v, days }) => (
-                <div key={v.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 1.25rem', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor(days), flexShrink: 0, marginTop: 4 }} />
+          )}
+
+          {vehicles.map(v => {
+            const status = getAlertStatus(v)
+            const days = getDaysUntilAlert(v)
+            const ck = (ok: boolean) => (
+              <span style={{ fontSize: 13, color: ok ? 'var(--ok)' : '#ccc', fontWeight: 500 }}>{ok ? '✓' : '✗'}</span>
+            )
+            return (
+              <div key={v.id} className="vehicle-card">
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500 }}>{v.immat} — {v.model}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                      {days !== null && days <= 0 ? 'Échéance dépassée' : `Dans ${days} jour${days !== 1 ? 's' : ''}`}
-                      {' · '}Alerte assurance (J+{ALERT_DAYS})
-                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 500 }}>{v.immat}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{v.model}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <StatusBadge status={status} days={days} />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Fleet table */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
-            <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Parc véhicules</span>
-              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{vehicles.length} véhicule{vehicles.length > 1 ? 's' : ''}</span>
-            </div>
-            {loading ? (
-              <div style={{ padding: '2rem', textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)' }}>Chargement…</div>
-            ) : vehicles.length === 0 ? (
-              <div style={{ padding: '2rem', textAlign: 'center', fontSize: 13, color: 'var(--text-secondary)' }}>
-                Aucun véhicule — cliquez sur "Ajouter un véhicule" pour commencer.
+                {v.conducteur && (
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                    👤 {v.conducteur}{v.tel ? ` · ${v.tel}` : ''}
+                  </div>
+                )}
+
+                {v.assurance && (
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                    🛡 {v.assurance}{v.date_assurance ? ` · ${format(new Date(v.date_assurance), 'dd/MM/yyyy')}` : ''}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                  <div style={{ display: 'flex', gap: 12, fontSize: 12 }}>
+                    <span>{ck(v.ct_ok)} CT</span>
+                    <span>{ck(v.cg_ok)} CG</span>
+                    <span>{ck(v.entretien_ok)} Entretien</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <button
+                      onClick={() => { setEditVehicle(v); setModalOpen(true) }}
+                      style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', color: 'var(--text-secondary)' }}
+                    ><Pencil size={14} /></button>
+                    <button
+                      onClick={() => setDelId(v.id)}
+                      style={{ background: 'var(--danger-light)', border: '1px solid var(--danger)', borderRadius: 8, padding: '6px 10px', color: 'var(--danger)' }}
+                    ><Trash2 size={14} /></button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                  <thead>
-                    <tr style={{ background: 'var(--bg-base)' }}>
-                      {['Immat.','Modèle','Conducteur','Tél.','Assurance','Souscription','Sinistre','CT','CG','Entretien','Statut',''].map(h => (
-                        <th key={h} style={{ padding: '9px 12px', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: 500, borderBottom: '1px solid var(--border)', whiteSpace: 'nowrap' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {vehicles.map(v => (
-                      <tr key={v.id} style={{ borderBottom: '1px solid var(--border)' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-base)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        <td style={{ padding: '10px 12px', fontWeight: 500 }}>{v.immat}</td>
-                        <td style={{ padding: '10px 12px' }}>{v.model}</td>
-                        <td style={{ padding: '10px 12px' }}>{v.conducteur || '—'}</td>
-                        <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{v.tel || '—'}</td>
-                        <td style={{ padding: '10px 12px' }}>{v.assurance || '—'}</td>
-                        <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontSize: 11 }}>{v.date_assurance ? format(new Date(v.date_assurance), 'dd/MM/yyyy') : '—'}</td>
-                        <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontSize: 11 }}>{v.date_sinistre ? format(new Date(v.date_sinistre), 'dd/MM/yyyy') : '—'}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>{ck(v.ct_ok)}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>{ck(v.cg_ok)}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>{ck(v.entretien_ok)}</td>
-                        <td style={{ padding: '10px 12px' }}><StatusBadge status={getAlertStatus(v)} days={getDaysUntilAlert(v)} /></td>
-                        <td style={{ padding: '10px 12px' }}>
-                          <div style={{ display: 'flex', gap: 4 }}>
-                            <button onClick={() => { setEditVehicle(v); setModalOpen(true) }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', padding: '3px 5px', borderRadius: 5, cursor: 'pointer' }} title="Modifier"><Pencil size={14} /></button>
-                            <button onClick={() => setDelId(v.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', padding: '3px 5px', borderRadius: 5, cursor: 'pointer' }} title="Supprimer"><Trash2 size={14} /></button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+            )
+          })}
         </div>
-      </main>
+      </div>
 
-      {modalOpen && <VehicleModal vehicle={editVehicle} onClose={() => { setModalOpen(false); setEditVehicle(null) }} onSave={handleSave} />}
+      <BottomNav alertCount={alertCount} />
+
+      {modalOpen && (
+        <VehicleModal
+          vehicle={editVehicle}
+          onClose={() => { setModalOpen(false); setEditVehicle(null) }}
+          onSave={handleSave}
+        />
+      )}
 
       {delId && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 12, border: '1px solid var(--border)', padding: '1.5rem', width: 340, textAlign: 'center' }} className="fade-in">
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '1rem' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '1.5rem', width: '100%', maxWidth: 340, textAlign: 'center' }} className="fade-in">
             <Trash2 size={28} style={{ color: 'var(--danger)', margin: '0 auto 12px', display: 'block' }} />
             <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 8 }}>Supprimer ce véhicule ?</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
               {vehicles.find(v => v.id === delId)?.immat} — {vehicles.find(v => v.id === delId)?.model}
             </div>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              <button onClick={() => setDelId(null)} style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid var(--border-strong)', background: 'transparent', fontSize: 13, cursor: 'pointer' }}>Annuler</button>
-              <button onClick={handleDelete} style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: 'var(--danger)', color: '#fff', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>Supprimer</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setDelId(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, border: '1px solid var(--border-strong)', background: 'transparent', fontSize: 14 }}>Annuler</button>
+              <button onClick={handleDelete} style={{ flex: 1, padding: '12px', borderRadius: 10, border: 'none', background: 'var(--danger)', color: '#fff', fontSize: 14, fontWeight: 500 }}>Supprimer</button>
             </div>
           </div>
         </div>
