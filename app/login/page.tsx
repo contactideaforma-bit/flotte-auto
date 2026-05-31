@@ -1,12 +1,10 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Car, LogIn } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -22,8 +20,7 @@ export default function LoginPage() {
       setError('Email ou mot de passe incorrect')
       setLoading(false)
     } else {
-      router.push('/dashboard')
-      router.refresh()
+      window.location.href = '/dashboard'
     }
   }
 
@@ -33,7 +30,6 @@ export default function LoginPage() {
       background: 'var(--bg-base)', padding: '1rem',
     }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
-
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{
             width: 52, height: 52, borderRadius: 14,
@@ -55,19 +51,11 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
               <label style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'block', marginBottom: 5 }}>Email</label>
-              <input
-                type="email" required autoFocus
-                placeholder="vous@email.com"
-                value={email} onChange={e => setEmail(e.target.value)}
-              />
+              <input type="email" required autoFocus placeholder="vous@email.com" value={email} onChange={e => setEmail(e.target.value)} />
             </div>
             <div>
               <label style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'block', marginBottom: 5 }}>Mot de passe</label>
-              <input
-                type="password" required
-                placeholder="••••••••"
-                value={password} onChange={e => setPassword(e.target.value)}
-              />
+              <input type="password" required placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
             </div>
 
             {error && (
