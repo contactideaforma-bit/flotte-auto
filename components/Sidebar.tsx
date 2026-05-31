@@ -1,17 +1,26 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Car, Bell, Settings } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, Car, Bell, LogOut } from 'lucide-react'
+import { createClient } from '@/lib/supabase-client'
 
 const nav = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/vehicles',  label: 'Véhicules',        icon: Car },
-  { href: '/dashboard#alertes', label: 'Alertes', icon: Bell },
-  { href: '/dashboard#settings', label: 'Paramètres', icon: Settings },
+  { href: '/dashboard#alertes', label: 'Alertes',  icon: Bell },
 ]
 
-export default function Sidebar({ alertCount = 0 }: { alertCount?: number }) {
+export default function Sidebar({ alertCount = 0, userEmail = '' }: { alertCount?: number; userEmail?: string }) {
   const path = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
+
   return (
     <aside style={{
       width: 220, flexShrink: 0,
@@ -45,11 +54,9 @@ export default function Sidebar({ alertCount = 0 }: { alertCount?: number }) {
                 padding: '10px 1.25rem',
                 background: active ? 'var(--bg-sidebar-active)' : 'transparent',
                 color: active ? '#fff' : 'var(--text-sidebar)',
-                fontSize: 13,
-                fontWeight: active ? 500 : 400,
-                transition: 'background 0.15s, color 0.15s',
+                fontSize: 13, fontWeight: active ? 500 : 400,
+                transition: 'background 0.15s',
                 cursor: 'pointer',
-                position: 'relative',
               }}
               onMouseEnter={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-sidebar-hover)' }}
               onMouseLeave={e => { if (!active) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
@@ -58,13 +65,9 @@ export default function Sidebar({ alertCount = 0 }: { alertCount?: number }) {
                 <span>{label}</span>
                 {label === 'Alertes' && alertCount > 0 && (
                   <span style={{
-                    marginLeft: 'auto',
-                    background: 'var(--danger)',
-                    color: '#fff',
-                    fontSize: 10,
-                    padding: '1px 7px',
-                    borderRadius: 20,
-                    fontWeight: 500,
+                    marginLeft: 'auto', background: 'var(--danger)',
+                    color: '#fff', fontSize: 10, padding: '1px 7px',
+                    borderRadius: 20, fontWeight: 500,
                   }}>{alertCount}</span>
                 )}
               </div>
@@ -74,10 +77,23 @@ export default function Sidebar({ alertCount = 0 }: { alertCount?: number }) {
       </nav>
 
       <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ fontSize: 11, color: 'var(--text-sidebar)', lineHeight: 1.5 }}>
-          Alertes assurance<br />
-          <span style={{ color: 'rgba(255,255,255,0.4)' }}>J+40 après souscription</span>
-        </div>
+        {userEmail && (
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {userEmail}
+          </div>
+        )}
+        <button onClick={handleLogout} style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          width: '100%', padding: '8px 10px',
+          background: 'rgba(255,255,255,0.06)', border: 'none',
+          borderRadius: 8, color: 'var(--text-sidebar)',
+          fontSize: 13, cursor: 'pointer',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+        >
+          <LogOut size={15} /> Déconnexion
+        </button>
       </div>
     </aside>
   )
