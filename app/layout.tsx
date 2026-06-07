@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Flotte Auto — Mymy la King',
+  title: 'Flotte Auto',
   description: 'Gestion de parc automobile',
   appleWebApp: {
     capable: true,

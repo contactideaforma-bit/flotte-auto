@@ -1,18 +1,18 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Car, Bell, LogOut } from 'lucide-react'
+import { LayoutDashboard, Car, Bell, LogOut, UserCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 
 const nav = [
   { href: '/dashboard', label: 'Accueil',    icon: LayoutDashboard },
   { href: '/vehicles',  label: 'Véhicules',  icon: Car },
   { href: '/alertes',   label: 'Alertes',    icon: Bell },
+  { href: '/profile',   label: 'Profil',     icon: UserCircle },
 ]
 
 export default function BottomNav({ alertCount = 0 }: { alertCount?: number }) {
   const path = usePathname()
-  const router = useRouter()
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -34,6 +34,7 @@ export default function BottomNav({ alertCount = 0 }: { alertCount?: number }) {
                   background: 'var(--danger)', color: '#fff',
                   fontSize: 9, padding: '1px 5px', borderRadius: 10,
                   fontWeight: 600, lineHeight: 1.4,
+                  boxShadow: '0 0 6px rgba(255,45,85,0.6)',
                 }}>{alertCount}</span>
               )}
             </div>

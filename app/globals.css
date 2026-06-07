@@ -1,37 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-sans: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-display: 'Orbitron', sans-serif;
+  --font-sans:    'Exo 2', system-ui, sans-serif;
+  --font-mono:    'DM Mono', monospace;
 
-  --bg-base:    #f5f4f1;
-  --bg-card:    #ffffff;
-  --bg-sidebar: #1a1a2e;
-  --bg-sidebar-hover: #16213e;
-  --bg-sidebar-active: #0f3460;
+  /* Backgrounds */
+  --bg-base:              #07000e;
+  --bg-card:              #110020;
+  --bg-card-hover:        #180030;
+  --bg-sidebar:           #090016;
+  --bg-sidebar-hover:     #1a0035;
+  --bg-sidebar-active:    #2d0055;
 
-  --text-primary:   #0d0d0d;
-  --text-secondary: #6b6b6b;
-  --text-sidebar:   #a8b2d8;
-  --text-sidebar-active: #ffffff;
+  /* Text */
+  --text-primary:         #f0e4ff;
+  --text-secondary:       #9b7ab8;
+  --text-sidebar:         #c9a0ff;
+  --text-sidebar-active:  #ffffff;
 
-  --border: #e8e6e0;
-  --border-strong: #d0cec8;
+  /* Borders */
+  --border:               rgba(180, 80, 255, 0.18);
+  --border-strong:        rgba(233, 30, 140, 0.35);
 
-  --accent:       #4f46e5;
-  --accent-light: #e0e7ff;
-  --accent-text:  #3730a3;
+  /* Accent — hot pink */
+  --accent:               #e91e8c;
+  --accent-light:         rgba(233, 30, 140, 0.15);
+  --accent-text:          #ff69c0;
 
-  --ok:           #16a34a;
-  --ok-light:     #dcfce7;
-  --warn:         #d97706;
-  --warn-light:   #fef3c7;
-  --danger:       #dc2626;
-  --danger-light: #fee2e2;
+  /* Accent 2 — purple */
+  --accent2:              #9b00ff;
+  --accent2-light:        rgba(155, 0, 255, 0.15);
+
+  /* Status */
+  --ok:                   #00e5a0;
+  --ok-light:             rgba(0, 229, 160, 0.12);
+  --warn:                 #ffb800;
+  --warn-light:           rgba(255, 184, 0, 0.12);
+  --danger:               #ff2d55;
+  --danger-light:         rgba(255, 45, 85, 0.12);
+
+  /* Glows */
+  --glow-pink:   0 0 18px rgba(233, 30, 140, 0.55);
+  --glow-purple: 0 0 18px rgba(155, 0, 255, 0.55);
+  --glow-sm:     0 0 8px  rgba(233, 30, 140, 0.35);
 
   --bottom-nav-height: 64px;
 }
@@ -46,21 +62,36 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Grille néon subtile en fond */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(155, 0, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 0, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Inputs ─────────────────────────────────────── */
 input, textarea, select {
   font-family: var(--font-sans);
-  background: var(--bg-base);
+  background: rgba(155, 0, 255, 0.07);
   border: 1px solid var(--border-strong);
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 16px;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   width: 100%;
 }
 input:focus, textarea:focus, select:focus {
   border-color: var(--accent);
-  background: #fff;
+  box-shadow: var(--glow-sm);
+  background: rgba(233, 30, 140, 0.08);
 }
 input[type="checkbox"] {
   width: 18px; height: 18px;
@@ -68,28 +99,40 @@ input[type="checkbox"] {
   cursor: pointer;
   flex-shrink: 0;
 }
+input::placeholder, textarea::placeholder {
+  color: rgba(180, 80, 255, 0.4);
+}
+select option {
+  background: #1a0035;
+  color: var(--text-primary);
+}
 
 button { font-family: var(--font-sans); cursor: pointer; }
 
+/* ─── Scrollbar ──────────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
+/* ─── Animations ─────────────────────────────────── */
 .fade-in { animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-/* Bottom nav */
+/* ─── Bottom Nav ─────────────────────────────────── */
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   height: var(--bottom-nav-height);
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
+  background: rgba(9, 0, 22, 0.96);
+  border-top: 1px solid var(--border-strong);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 100;
+  box-shadow: 0 -4px 30px rgba(233, 30, 140, 0.15);
 }
 
 .bottom-nav-item {
@@ -97,32 +140,36 @@ button { font-family: var(--font-sans); cursor: pointer; }
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 6px 16px;
+  padding: 6px 10px;
   border-radius: 10px;
   color: var(--text-secondary);
   font-size: 10px;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.15s;
-  min-width: 60px;
+  min-width: 48px;
+  letter-spacing: 0.02em;
 }
 .bottom-nav-item.active {
   color: var(--accent);
+  text-shadow: 0 0 8px rgba(233, 30, 140, 0.8);
 }
 
-/* Page container with bottom nav padding */
+/* ─── Page layout ────────────────────────────────── */
 .page-content {
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 1rem);
+  position: relative;
+  z-index: 1;
 }
 
-/* Cards */
+/* ─── Cards ──────────────────────────────────────── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 14px;
+  position: relative;
 }
 
-/* Vehicle row card */
 .vehicle-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -131,13 +178,35 @@ button { font-family: var(--font-sans); cursor: pointer; }
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.vehicle-card:hover {
+  border-color: rgba(233, 30, 140, 0.4);
+  box-shadow: 0 4px 20px rgba(233, 30, 140, 0.1);
 }
 
+/* ─── Badges ─────────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 3px 10px;
   border-radius: 20px;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ─── Neon divider ───────────────────────────────── */
+.neon-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  opacity: 0.4;
+  margin: 1.5rem 0;
+}
+
+/* ─── Headings ───────────────────────────────────── */
+h1, h2 {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
 }
