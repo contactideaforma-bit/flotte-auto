@@ -4,39 +4,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ═══════════════════════════════════════════════════
+   THÈME SOMBRE (défaut)
+═══════════════════════════════════════════════════ */
+:root,
+[data-theme="dark"] {
   --font-display: 'Orbitron', sans-serif;
   --font-sans:    'Exo 2', system-ui, sans-serif;
   --font-mono:    'DM Mono', monospace;
 
-  /* Backgrounds */
   --bg-base:              #07000e;
   --bg-card:              #110020;
-  --bg-card-hover:        #180030;
   --bg-sidebar:           #090016;
   --bg-sidebar-hover:     #1a0035;
   --bg-sidebar-active:    #2d0055;
 
-  /* Text */
   --text-primary:         #f0e4ff;
   --text-secondary:       #9b7ab8;
   --text-sidebar:         #c9a0ff;
   --text-sidebar-active:  #ffffff;
 
-  /* Borders */
   --border:               rgba(180, 80, 255, 0.18);
   --border-strong:        rgba(233, 30, 140, 0.35);
 
-  /* Accent — hot pink */
   --accent:               #e91e8c;
   --accent-light:         rgba(233, 30, 140, 0.15);
   --accent-text:          #ff69c0;
 
-  /* Accent 2 — purple */
   --accent2:              #9b00ff;
   --accent2-light:        rgba(155, 0, 255, 0.15);
 
-  /* Status */
   --ok:                   #00e5a0;
   --ok-light:             rgba(0, 229, 160, 0.12);
   --warn:                 #ffb800;
@@ -44,14 +41,71 @@
   --danger:               #ff2d55;
   --danger-light:         rgba(255, 45, 85, 0.12);
 
-  /* Glows */
   --glow-pink:   0 0 18px rgba(233, 30, 140, 0.55);
   --glow-purple: 0 0 18px rgba(155, 0, 255, 0.55);
   --glow-sm:     0 0 8px  rgba(233, 30, 140, 0.35);
 
+  --grid-color:  rgba(155, 0, 255, 0.04);
+  --grid-size:   40px;
+
+  --nav-bg:      rgba(9, 0, 22, 0.96);
+  --nav-shadow:  0 -4px 30px rgba(233, 30, 140, 0.15);
+
+  --input-bg:    rgba(155, 0, 255, 0.07);
+  --input-focus: rgba(233, 30, 140, 0.08);
+
   --bottom-nav-height: 64px;
 }
 
+/* ═══════════════════════════════════════════════════
+   THÈME CLAIR — glassmorphisme sur fond dégradé
+═══════════════════════════════════════════════════ */
+[data-theme="light"] {
+  --bg-base:              #f3e8ff;
+  --bg-card:              rgba(255, 255, 255, 0.65);
+  --bg-sidebar:           rgba(255, 255, 255, 0.88);
+  --bg-sidebar-hover:     rgba(233, 30, 140, 0.08);
+  --bg-sidebar-active:    rgba(233, 30, 140, 0.14);
+
+  --text-primary:         #1a0035;
+  --text-secondary:       #7a4d9a;
+  --text-sidebar:         #5a2d7a;
+  --text-sidebar-active:  #1a0035;
+
+  --border:               rgba(180, 80, 255, 0.2);
+  --border-strong:        rgba(233, 30, 140, 0.3);
+
+  --accent:               #e91e8c;
+  --accent-light:         rgba(233, 30, 140, 0.12);
+  --accent-text:          #c0006a;
+
+  --accent2:              #9b00ff;
+  --accent2-light:        rgba(155, 0, 255, 0.1);
+
+  --ok:                   #00a86b;
+  --ok-light:             rgba(0, 168, 107, 0.12);
+  --warn:                 #e08000;
+  --warn-light:           rgba(224, 128, 0, 0.12);
+  --danger:               #e0003a;
+  --danger-light:         rgba(224, 0, 58, 0.1);
+
+  --glow-pink:   0 0 18px rgba(233, 30, 140, 0.3);
+  --glow-purple: 0 0 18px rgba(155, 0, 255, 0.3);
+  --glow-sm:     0 0 8px  rgba(233, 30, 140, 0.2);
+
+  --grid-color:  rgba(155, 0, 255, 0.06);
+  --grid-size:   40px;
+
+  --nav-bg:      rgba(255, 255, 255, 0.85);
+  --nav-shadow:  0 -2px 20px rgba(233, 30, 140, 0.1);
+
+  --input-bg:    rgba(255, 255, 255, 0.7);
+  --input-focus: rgba(255, 255, 255, 0.95);
+}
+
+/* ═══════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 html, body {
@@ -60,17 +114,24 @@ html, body {
   background: var(--bg-base);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
 }
 
-/* Grille néon subtile en fond */
+/* Fond dégradé en mode clair */
+[data-theme="light"] body {
+  background: linear-gradient(135deg, #fdf4ff 0%, #f0e4ff 40%, #fce4f3 100%);
+  min-height: 100vh;
+}
+
+/* Grille néon subtile */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(155, 0, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(155, 0, 255, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
   pointer-events: none;
   z-index: 0;
 }
@@ -78,20 +139,20 @@ body::before {
 /* ─── Inputs ─────────────────────────────────────── */
 input, textarea, select {
   font-family: var(--font-sans);
-  background: rgba(155, 0, 255, 0.07);
+  background: var(--input-bg);
   border: 1px solid var(--border-strong);
   border-radius: 10px;
   padding: 12px 14px;
   font-size: 16px;
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   width: 100%;
 }
 input:focus, textarea:focus, select:focus {
   border-color: var(--accent);
   box-shadow: var(--glow-sm);
-  background: rgba(233, 30, 140, 0.08);
+  background: var(--input-focus);
 }
 input[type="checkbox"] {
   width: 18px; height: 18px;
@@ -100,11 +161,19 @@ input[type="checkbox"] {
   flex-shrink: 0;
 }
 input::placeholder, textarea::placeholder {
-  color: rgba(180, 80, 255, 0.4);
+  color: rgba(155, 0, 255, 0.35);
+}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: rgba(155, 0, 255, 0.4);
 }
 select option {
   background: #1a0035;
-  color: var(--text-primary);
+  color: #f0e4ff;
+}
+[data-theme="light"] select option {
+  background: #fff;
+  color: #1a0035;
 }
 
 button { font-family: var(--font-sans); cursor: pointer; }
@@ -123,16 +192,17 @@ button { font-family: var(--font-sans); cursor: pointer; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   height: var(--bottom-nav-height);
-  background: rgba(9, 0, 22, 0.96);
+  background: var(--nav-bg);
   border-top: 1px solid var(--border-strong);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 100;
-  box-shadow: 0 -4px 30px rgba(233, 30, 140, 0.15);
+  box-shadow: var(--nav-shadow);
+  transition: background 0.3s, box-shadow 0.3s;
 }
 
 .bottom-nav-item {
@@ -152,7 +222,7 @@ button { font-family: var(--font-sans); cursor: pointer; }
 }
 .bottom-nav-item.active {
   color: var(--accent);
-  text-shadow: 0 0 8px rgba(233, 30, 140, 0.8);
+  text-shadow: 0 0 8px rgba(233, 30, 140, 0.5);
 }
 
 /* ─── Page layout ────────────────────────────────── */
@@ -168,6 +238,14 @@ button { font-family: var(--font-sans); cursor: pointer; }
   border: 1px solid var(--border);
   border-radius: 14px;
   position: relative;
+  transition: background 0.3s, border-color 0.2s;
+}
+
+/* Glassmorphisme en mode clair */
+[data-theme="light"] .card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(155, 0, 255, 0.08);
 }
 
 .vehicle-card {
@@ -178,11 +256,15 @@ button { font-family: var(--font-sans); cursor: pointer; }
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.3s;
 }
 .vehicle-card:hover {
   border-color: rgba(233, 30, 140, 0.4);
   box-shadow: 0 4px 20px rgba(233, 30, 140, 0.1);
+}
+[data-theme="light"] .vehicle-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* ─── Badges ─────────────────────────────────────── */

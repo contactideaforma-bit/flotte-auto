@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LayoutDashboard, Car, Bell, LogOut, UserCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
+import ThemeToggle from './ThemeToggle'
 
 const nav = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -109,6 +110,9 @@ export default function Sidebar({ alertCount = 0, userEmail = '', displayName = 
             {userLabel}
           </div>
         )}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <ThemeToggle compact />
+        </div>
         <button onClick={handleLogout} style={{
           display: 'flex', alignItems: 'center', gap: 8,
           width: '100%', padding: '8px 10px',

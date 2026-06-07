@@ -1,8 +1,9 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Car, Bell, LogOut, UserCircle } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { LayoutDashboard, Car, Bell, UserCircle, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
+import ThemeToggle from './ThemeToggle'
 
 const nav = [
   { href: '/dashboard', label: 'Accueil',    icon: LayoutDashboard },
@@ -42,6 +43,7 @@ export default function BottomNav({ alertCount = 0 }: { alertCount?: number }) {
           </Link>
         )
       })}
+      <ThemeToggle />
       <button onClick={handleLogout} className="bottom-nav-item" style={{ background: 'none', border: 'none' }}>
         <LogOut size={22} />
         <span>Quitter</span>
